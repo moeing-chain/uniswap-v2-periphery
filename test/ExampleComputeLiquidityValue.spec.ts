@@ -1,12 +1,15 @@
-import { AddressZero, MaxUint256 } from 'ethers/constants'
+import { constants, Contract } from 'ethers'
 import chai, { expect } from 'chai'
-import { Contract } from 'ethers'
-import { solidity, MockProvider, createFixtureLoader, deployContract } from 'ethereum-waffle'
+import { solidity, createFixtureLoader, deployContract } from 'ethereum-waffle'
 
 import { expandTo18Decimals } from './shared/utilities'
 import { v2Fixture } from './shared/fixtures'
+import { createProviderAndWallets } from './shared/sbch'
 
 import ExampleComputeLiquidityValue from '../build/ExampleComputeLiquidityValue.json'
+
+const AddressZero = constants.AddressZero;
+const MaxUint256 = constants.MaxUint256;
 
 chai.use(solidity)
 
@@ -15,13 +18,14 @@ const overrides = {
 }
 
 describe('ExampleComputeLiquidityValue', () => {
-  const provider = new MockProvider({
-    hardfork: 'istanbul',
-    mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
-    gasLimit: 9999999
-  })
-  const [wallet] = provider.getWallets()
-  const loadFixture = createFixtureLoader(provider, [wallet])
+  // const provider = new MockProvider({
+  //   hardfork: 'istanbul',
+  //   mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
+  //   gasLimit: 9999999
+  // })
+  // const [wallet] = provider.getWallets()
+  // const loadFixture = createFixtureLoader(provider, [wallet])
+  const [provider, wallet, other] = createProviderAndWallets(false)
 
   let token0: Contract
   let token1: Contract
@@ -30,7 +34,7 @@ describe('ExampleComputeLiquidityValue', () => {
   let computeLiquidityValue: Contract
   let router: Contract
   beforeEach(async function() {
-    const fixture = await loadFixture(v2Fixture)
+    const fixture = await v2Fixture(provider, [wallet])
     token0 = fixture.token0
     token1 = fixture.token1
     pair = fixture.pair

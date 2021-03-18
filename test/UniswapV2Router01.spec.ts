@@ -1,12 +1,16 @@
 import chai, { expect } from 'chai'
-import { Contract } from 'ethers'
-import { AddressZero, Zero, MaxUint256 } from 'ethers/constants'
-import { BigNumber, bigNumberify } from 'ethers/utils'
-import { solidity, MockProvider, createFixtureLoader } from 'ethereum-waffle'
+import { constants, BigNumber, Contract } from 'ethers'
+import { solidity, createFixtureLoader } from 'ethereum-waffle'
 import { ecsign } from 'ethereumjs-util'
 
 import { expandTo18Decimals, getApprovalDigest, mineBlock, MINIMUM_LIQUIDITY } from './shared/utilities'
 import { v2Fixture } from './shared/fixtures'
+import { createProviderAndWallets } from './shared/sbch'
+
+const AddressZero = constants.AddressZero;
+const MaxUint256 = constants.MaxUint256;
+const Zero = constants.Zero;
+const bigNumberify = BigNumber.from;
 
 chai.use(solidity)
 
@@ -21,13 +25,14 @@ enum RouterVersion {
 
 describe('UniswapV2Router{01,02}', () => {
   for (const routerVersion of Object.keys(RouterVersion)) {
-    const provider = new MockProvider({
-      hardfork: 'istanbul',
-      mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
-      gasLimit: 9999999
-    })
-    const [wallet] = provider.getWallets()
-    const loadFixture = createFixtureLoader(provider, [wallet])
+    // const provider = new MockProvider({
+    //   hardfork: 'istanbul',
+    //   mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
+    //   gasLimit: 9999999
+    // })
+    // const [wallet] = provider.getWallets()
+    // const loadFixture = createFixtureLoader(provider, [wallet])
+    const [provider, wallet, other] = createProviderAndWallets(false)
 
     let token0: Contract
     let token1: Contract
@@ -39,7 +44,7 @@ describe('UniswapV2Router{01,02}', () => {
     let WETHPair: Contract
     let routerEventEmitter: Contract
     beforeEach(async function() {
-      const fixture = await loadFixture(v2Fixture)
+      const fixture = await v2Fixture(provider, [wallet])
       token0 = fixture.token0
       token1 = fixture.token1
       WETH = fixture.WETH

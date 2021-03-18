@@ -1,12 +1,14 @@
 import chai, { expect } from 'chai'
-import { Contract } from 'ethers'
-import { BigNumber, bigNumberify } from 'ethers/utils'
-import { solidity, MockProvider, createFixtureLoader, deployContract } from 'ethereum-waffle'
+import { BigNumber, Contract } from 'ethers'
+import { solidity, createFixtureLoader, deployContract } from 'ethereum-waffle'
 
 import { expandTo18Decimals, mineBlock, encodePrice } from './shared/utilities'
 import { v2Fixture } from './shared/fixtures'
+import { createProviderAndWallets } from './shared/sbch'
 
 import ExampleSlidingWindowOracle from '../build/ExampleSlidingWindowOracle.json'
+
+const bigNumberify = BigNumber.from;
 
 chai.use(solidity)
 
@@ -18,13 +20,14 @@ const defaultToken0Amount = expandTo18Decimals(5)
 const defaultToken1Amount = expandTo18Decimals(10)
 
 describe('ExampleSlidingWindowOracle', () => {
-  const provider = new MockProvider({
-    hardfork: 'istanbul',
-    mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
-    gasLimit: 9999999
-  })
-  const [wallet] = provider.getWallets()
-  const loadFixture = createFixtureLoader(provider, [wallet])
+  // const provider = new MockProvider({
+  //   hardfork: 'istanbul',
+  //   mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
+  //   gasLimit: 9999999
+  // })
+  // const [wallet] = provider.getWallets()
+  // const loadFixture = createFixtureLoader(provider, [wallet])
+  const [provider, wallet, other] = createProviderAndWallets(false)
 
   let token0: Contract
   let token1: Contract
@@ -56,7 +59,7 @@ describe('ExampleSlidingWindowOracle', () => {
   }
 
   beforeEach('deploy fixture', async function() {
-    const fixture = await loadFixture(v2Fixture)
+    const fixture = await v2Fixture(provider, [wallet])
 
     token0 = fixture.token0
     token1 = fixture.token1

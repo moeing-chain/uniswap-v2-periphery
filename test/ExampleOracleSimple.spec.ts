@@ -1,10 +1,10 @@
 import chai, { expect } from 'chai'
-import { Contract } from 'ethers'
-import { BigNumber } from 'ethers/utils'
-import { solidity, MockProvider, createFixtureLoader, deployContract } from 'ethereum-waffle'
+import { BigNumber, Contract } from 'ethers'
+import { solidity, createFixtureLoader, deployContract } from 'ethereum-waffle'
 
 import { expandTo18Decimals, mineBlock, encodePrice } from './shared/utilities'
 import { v2Fixture } from './shared/fixtures'
+import { createProviderAndWallets } from './shared/sbch'
 
 import ExampleOracleSimple from '../build/ExampleOracleSimple.json'
 
@@ -18,13 +18,14 @@ const token0Amount = expandTo18Decimals(5)
 const token1Amount = expandTo18Decimals(10)
 
 describe('ExampleOracleSimple', () => {
-  const provider = new MockProvider({
-    hardfork: 'istanbul',
-    mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
-    gasLimit: 9999999
-  })
-  const [wallet] = provider.getWallets()
-  const loadFixture = createFixtureLoader(provider, [wallet])
+  // const provider = new MockProvider({
+  //   hardfork: 'istanbul',
+  //   mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
+  //   gasLimit: 9999999
+  // })
+  // const [wallet] = provider.getWallets()
+  // const loadFixture = createFixtureLoader(provider, [wallet])
+  const [provider, wallet, other] = createProviderAndWallets(false)
 
   let token0: Contract
   let token1: Contract
@@ -38,7 +39,7 @@ describe('ExampleOracleSimple', () => {
   }
 
   beforeEach(async function() {
-    const fixture = await loadFixture(v2Fixture)
+    const fixture = await v2Fixture(provider, [wallet])
 
     token0 = fixture.token0
     token1 = fixture.token1

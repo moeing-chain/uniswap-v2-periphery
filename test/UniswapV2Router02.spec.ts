@@ -1,15 +1,17 @@
 import chai, { expect } from 'chai'
 import { solidity, MockProvider, createFixtureLoader, deployContract } from 'ethereum-waffle'
-import { Contract } from 'ethers'
-import { BigNumber, bigNumberify } from 'ethers/utils'
-import { MaxUint256 } from 'ethers/constants'
+import { constants, BigNumber, Contract } from 'ethers'
 import IUniswapV2Pair from '@uniswap/v2-core/build/IUniswapV2Pair.json'
 
 import { v2Fixture } from './shared/fixtures'
 import { expandTo18Decimals, getApprovalDigest, MINIMUM_LIQUIDITY } from './shared/utilities'
+import { createProviderAndWallets } from './shared/sbch'
 
 import DeflatingERC20 from '../build/DeflatingERC20.json'
 import { ecsign } from 'ethereumjs-util'
+
+const MaxUint256 = constants.MaxUint256;
+const bigNumberify = BigNumber.from;
 
 chai.use(solidity)
 
@@ -18,19 +20,20 @@ const overrides = {
 }
 
 describe('UniswapV2Router02', () => {
-  const provider = new MockProvider({
-    hardfork: 'istanbul',
-    mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
-    gasLimit: 9999999
-  })
-  const [wallet] = provider.getWallets()
-  const loadFixture = createFixtureLoader(provider, [wallet])
+  // const provider = new MockProvider({
+  //   hardfork: 'istanbul',
+  //   mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
+  //   gasLimit: 9999999
+  // })
+  // const [wallet] = provider.getWallets()
+  // const loadFixture = createFixtureLoader(provider, [wallet])
+  const [provider, wallet, other] = createProviderAndWallets(false)
 
   let token0: Contract
   let token1: Contract
   let router: Contract
   beforeEach(async function() {
-    const fixture = await loadFixture(v2Fixture)
+    const fixture = await v2Fixture(provider, [wallet])
     token0 = fixture.token0
     token1 = fixture.token1
     router = fixture.router02
@@ -122,20 +125,21 @@ describe('UniswapV2Router02', () => {
 })
 
 describe('fee-on-transfer tokens', () => {
-  const provider = new MockProvider({
-    hardfork: 'istanbul',
-    mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
-    gasLimit: 9999999
-  })
-  const [wallet] = provider.getWallets()
-  const loadFixture = createFixtureLoader(provider, [wallet])
+  // const provider = new MockProvider({
+  //   hardfork: 'istanbul',
+  //   mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
+  //   gasLimit: 9999999
+  // })
+  // const [wallet] = provider.getWallets()
+  // const loadFixture = createFixtureLoader(provider, [wallet])
+  const [provider, wallet, other] = createProviderAndWallets(false)
 
   let DTT: Contract
   let WETH: Contract
   let router: Contract
   let pair: Contract
   beforeEach(async function() {
-    const fixture = await loadFixture(v2Fixture)
+    const fixture = await v2Fixture(provider, [wallet])
 
     WETH = fixture.WETH
     router = fixture.router02
@@ -309,19 +313,20 @@ describe('fee-on-transfer tokens', () => {
 })
 
 describe('fee-on-transfer tokens: reloaded', () => {
-  const provider = new MockProvider({
-    hardfork: 'istanbul',
-    mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
-    gasLimit: 9999999
-  })
-  const [wallet] = provider.getWallets()
-  const loadFixture = createFixtureLoader(provider, [wallet])
+  // const provider = new MockProvider({
+  //   hardfork: 'istanbul',
+  //   mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
+  //   gasLimit: 9999999
+  // })
+  // const [wallet] = provider.getWallets()
+  // const loadFixture = createFixtureLoader(provider, [wallet])
+  const [provider, wallet, other] = createProviderAndWallets(false)
 
   let DTT: Contract
   let DTT2: Contract
   let router: Contract
   beforeEach(async function() {
-    const fixture = await loadFixture(v2Fixture)
+    const fixture = await v2Fixture(provider, [wallet])
 
     router = fixture.router02
 

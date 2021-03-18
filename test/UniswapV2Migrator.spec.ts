@@ -1,11 +1,15 @@
 import chai, { expect } from 'chai'
 import { Contract } from 'ethers'
-import { AddressZero, MaxUint256 } from 'ethers/constants'
-import { bigNumberify } from 'ethers/utils'
-import { solidity, MockProvider, createFixtureLoader } from 'ethereum-waffle'
+import { constants, BigNumber } from 'ethers'
+import { solidity, createFixtureLoader } from 'ethereum-waffle'
 
 import { v2Fixture } from './shared/fixtures'
 import { expandTo18Decimals, MINIMUM_LIQUIDITY } from './shared/utilities'
+import { createProviderAndWallets } from './shared/sbch'
+
+const AddressZero = constants.AddressZero;
+const MaxUint256 = constants.MaxUint256;
+const bigNumberify = BigNumber.from;
 
 chai.use(solidity)
 
@@ -14,13 +18,14 @@ const overrides = {
 }
 
 describe('UniswapV2Migrator', () => {
-  const provider = new MockProvider({
-    hardfork: 'istanbul',
-    mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
-    gasLimit: 9999999
-  })
-  const [wallet] = provider.getWallets()
-  const loadFixture = createFixtureLoader(provider, [wallet])
+  // const provider = new MockProvider({
+  //   hardfork: 'istanbul',
+  //   mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
+  //   gasLimit: 9999999
+  // })
+  // const [wallet] = provider.getWallets()
+  // const loadFixture = createFixtureLoader(provider, [wallet])
+  const [provider, wallet, other] = createProviderAndWallets(false)
 
   let WETHPartner: Contract
   let WETHPair: Contract
@@ -28,7 +33,7 @@ describe('UniswapV2Migrator', () => {
   let migrator: Contract
   let WETHExchangeV1: Contract
   beforeEach(async function() {
-    const fixture = await loadFixture(v2Fixture)
+    const fixture = await v2Fixture(provider, [wallet])
     WETHPartner = fixture.WETHPartner
     WETHPair = fixture.WETHPair
     router = fixture.router01 // we used router01 for this contract

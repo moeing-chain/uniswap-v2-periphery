@@ -1,13 +1,17 @@
 import chai, { expect } from 'chai'
-import { Contract } from 'ethers'
-import { MaxUint256 } from 'ethers/constants'
-import { BigNumber, bigNumberify, defaultAbiCoder, formatEther } from 'ethers/utils'
-import { solidity, MockProvider, createFixtureLoader, deployContract } from 'ethereum-waffle'
+import { constants, utils, BigNumber, Contract } from 'ethers'
+import { solidity, createFixtureLoader, deployContract } from 'ethereum-waffle'
 
 import { expandTo18Decimals } from './shared/utilities'
 import { v2Fixture } from './shared/fixtures'
+import { createProviderAndWallets } from './shared/sbch'
 
 import ExampleFlashSwap from '../build/ExampleFlashSwap.json'
+
+const MaxUint256 = constants.MaxUint256;
+const bigNumberify = BigNumber.from;
+const defaultAbiCoder = utils.defaultAbiCoder;
+const formatEther = utils.formatEther;
 
 chai.use(solidity)
 
@@ -17,13 +21,14 @@ const overrides = {
 }
 
 describe('ExampleFlashSwap', () => {
-  const provider = new MockProvider({
-    hardfork: 'istanbul',
-    mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
-    gasLimit: 9999999
-  })
-  const [wallet] = provider.getWallets()
-  const loadFixture = createFixtureLoader(provider, [wallet])
+  // const provider = new MockProvider({
+  //   hardfork: 'istanbul',
+  //   mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
+  //   gasLimit: 9999999
+  // })
+  // const [wallet] = provider.getWallets()
+  // const loadFixture = createFixtureLoader(provider, [wallet])
+  const [provider, wallet, other] = createProviderAndWallets(false)
 
   let WETH: Contract
   let WETHPartner: Contract
@@ -31,7 +36,7 @@ describe('ExampleFlashSwap', () => {
   let WETHPair: Contract
   let flashSwapExample: Contract
   beforeEach(async function() {
-    const fixture = await loadFixture(v2Fixture)
+    const fixture = await v2Fixture(provider, [wallet])
 
     WETH = fixture.WETH
     WETHPartner = fixture.WETHPartner
