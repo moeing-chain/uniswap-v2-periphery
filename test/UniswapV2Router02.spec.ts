@@ -80,9 +80,9 @@ describe('UniswapV2Router02', () => {
   })
 
   it('getAmountsOut', async () => {
-    await token0.approve(router.address, MaxUint256)
-    await token1.approve(router.address, MaxUint256)
-    await router.addLiquidity(
+    const tx1 = await token0.approve(router.address, MaxUint256); await tx1.wait()
+    const tx2 = await token1.approve(router.address, MaxUint256); await tx2.wait()
+    const tx3 = await router.addLiquidity(
       token0.address,
       token1.address,
       bigNumberify(10000),
@@ -92,7 +92,7 @@ describe('UniswapV2Router02', () => {
       wallet.address,
       MaxUint256,
       overrides
-    )
+    ); await tx3.wait()
 
     await expect(router.getAmountsOut(bigNumberify(2), [token0.address])).to.be.revertedWith(
       'UniswapV2Library: INVALID_PATH'
@@ -102,9 +102,9 @@ describe('UniswapV2Router02', () => {
   })
 
   it('getAmountsIn', async () => {
-    await token0.approve(router.address, MaxUint256)
-    await token1.approve(router.address, MaxUint256)
-    await router.addLiquidity(
+    const tx1 = await token0.approve(router.address, MaxUint256); await tx1.wait()
+    const tx2 = await token1.approve(router.address, MaxUint256); await tx2.wait()
+    const tx3 = await router.addLiquidity(
       token0.address,
       token1.address,
       bigNumberify(10000),
@@ -114,7 +114,7 @@ describe('UniswapV2Router02', () => {
       wallet.address,
       MaxUint256,
       overrides
-    )
+    ); await tx3.wait()
 
     await expect(router.getAmountsIn(bigNumberify(1), [token0.address])).to.be.revertedWith(
       'UniswapV2Library: INVALID_PATH'
