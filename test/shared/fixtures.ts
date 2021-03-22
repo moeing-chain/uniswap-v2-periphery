@@ -46,7 +46,7 @@ export async function v2Fixture(provider: JsonRpcProvider, [wallet]: Wallet[]): 
 
   // deploy V1
   const factoryV1 = await deployContract(wallet, UniswapV1Factory, [])
-  await factoryV1.initializeFactory((await deployContract(wallet, UniswapV1Exchange, [])).address)
+  const tx1 = await factoryV1.initializeFactory((await deployContract(wallet, UniswapV1Exchange, [])).address); await tx1.wait()
 
   // deploy V2
   const factoryV2 = await deployContract(wallet, UniswapV2Factory, [wallet.address])
@@ -62,14 +62,14 @@ export async function v2Fixture(provider: JsonRpcProvider, [wallet]: Wallet[]): 
   const migrator = await deployContract(wallet, UniswapV2Migrator, [factoryV1.address, router01.address], overrides)
 
   // initialize V1
-  await factoryV1.createExchange(WETHPartner.address, overrides)
+  const tx2 = await factoryV1.createExchange(WETHPartner.address, overrides); await tx2.wait()
   const WETHExchangeV1Address = await factoryV1.getExchange(WETHPartner.address)
   const WETHExchangeV1 = new Contract(WETHExchangeV1Address, JSON.stringify(UniswapV1Exchange.abi), provider).connect(
     wallet
   )
 
   // initialize V2
-  await factoryV2.createPair(tokenA.address, tokenB.address)
+  const tx3 = await factoryV2.createPair(tokenA.address, tokenB.address); await tx3.wait()
   const pairAddress = await factoryV2.getPair(tokenA.address, tokenB.address)
   const pair = new Contract(pairAddress, JSON.stringify(IUniswapV2Pair.abi), provider).connect(wallet)
 
@@ -77,7 +77,7 @@ export async function v2Fixture(provider: JsonRpcProvider, [wallet]: Wallet[]): 
   const token0 = tokenA.address === token0Address ? tokenA : tokenB
   const token1 = tokenA.address === token0Address ? tokenB : tokenA
 
-  await factoryV2.createPair(WETH.address, WETHPartner.address)
+  const tx4 = await factoryV2.createPair(WETH.address, WETHPartner.address); await tx4.wait()
   const WETHPairAddress = await factoryV2.getPair(WETH.address, WETHPartner.address)
   const WETHPair = new Contract(WETHPairAddress, JSON.stringify(IUniswapV2Pair.abi), provider).connect(wallet)
 
