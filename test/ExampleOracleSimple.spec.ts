@@ -33,9 +33,9 @@ describe('ExampleOracleSimple', () => {
   let exampleOracleSimple: Contract
 
   async function addLiquidity() {
-    await token0.transfer(pair.address, token0Amount)
-    await token1.transfer(pair.address, token1Amount)
-    await pair.mint(wallet.address, overrides)
+    const tx1 = await token0.transfer(pair.address, token0Amount); await tx1.wait()
+    const tx2 = await token1.transfer(pair.address, token1Amount); await tx2.wait()
+    const tx3 = await pair.mint(wallet.address, overrides); await tx3.wait()
   }
 
   beforeEach(async function() {

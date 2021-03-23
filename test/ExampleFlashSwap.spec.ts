@@ -54,19 +54,19 @@ describe('ExampleFlashSwap', () => {
     // add liquidity to V1 at a rate of 1 ETH / 200 X
     const WETHPartnerAmountV1 = expandTo18Decimals(2000)
     const ETHAmountV1 = expandTo18Decimals(10)
-    await WETHPartner.approve(WETHExchangeV1.address, WETHPartnerAmountV1)
-    await WETHExchangeV1.addLiquidity(bigNumberify(1), WETHPartnerAmountV1, MaxUint256, {
+    const tx1 = await WETHPartner.approve(WETHExchangeV1.address, WETHPartnerAmountV1); await tx1.wait()
+    const tx2 = await WETHExchangeV1.addLiquidity(bigNumberify(1), WETHPartnerAmountV1, MaxUint256, {
       ...overrides,
       value: ETHAmountV1
-    })
+    }); await tx2.wait()
 
     // add liquidity to V2 at a rate of 1 ETH / 100 X
     const WETHPartnerAmountV2 = expandTo18Decimals(1000)
     const ETHAmountV2 = expandTo18Decimals(10)
-    await WETHPartner.transfer(WETHPair.address, WETHPartnerAmountV2)
-    await WETH.deposit({ value: ETHAmountV2 })
-    await WETH.transfer(WETHPair.address, ETHAmountV2)
-    await WETHPair.mint(wallet.address, overrides)
+    const tx3 = await WETHPartner.transfer(WETHPair.address, WETHPartnerAmountV2); await tx3.wait()
+    const tx4 = await WETH.deposit({ value: ETHAmountV2 }); await tx4.wait()
+    const tx5 = await WETH.transfer(WETHPair.address, ETHAmountV2); await tx5.wait()
+    const tx6 = await WETHPair.mint(wallet.address, overrides); await tx6.wait()
 
     const balanceBefore = await WETHPartner.balanceOf(wallet.address)
 
@@ -79,13 +79,13 @@ describe('ExampleFlashSwap', () => {
     const WETHPairToken0 = await WETHPair.token0()
     const amount0 = WETHPairToken0 === WETHPartner.address ? bigNumberify(0) : arbitrageAmount
     const amount1 = WETHPairToken0 === WETHPartner.address ? arbitrageAmount : bigNumberify(0)
-    await WETHPair.swap(
+    const tx7 = await WETHPair.swap(
       amount0,
       amount1,
       flashSwapExample.address,
       defaultAbiCoder.encode(['uint'], [bigNumberify(1)]),
       overrides
-    )
+    ); await tx7.wait()
 
     const balanceAfter = await WETHPartner.balanceOf(wallet.address)
     const profit = balanceAfter.sub(balanceBefore).div(expandTo18Decimals(1))
@@ -107,19 +107,19 @@ describe('ExampleFlashSwap', () => {
     // add liquidity to V1 at a rate of 1 ETH / 100 X
     const WETHPartnerAmountV1 = expandTo18Decimals(1000)
     const ETHAmountV1 = expandTo18Decimals(10)
-    await WETHPartner.approve(WETHExchangeV1.address, WETHPartnerAmountV1)
-    await WETHExchangeV1.addLiquidity(bigNumberify(1), WETHPartnerAmountV1, MaxUint256, {
+    const tx1 = await WETHPartner.approve(WETHExchangeV1.address, WETHPartnerAmountV1); await tx1.wait()
+    const tx2 = await WETHExchangeV1.addLiquidity(bigNumberify(1), WETHPartnerAmountV1, MaxUint256, {
       ...overrides,
       value: ETHAmountV1
-    })
+    }); await tx2.wait()
 
     // add liquidity to V2 at a rate of 1 ETH / 200 X
     const WETHPartnerAmountV2 = expandTo18Decimals(2000)
     const ETHAmountV2 = expandTo18Decimals(10)
-    await WETHPartner.transfer(WETHPair.address, WETHPartnerAmountV2)
-    await WETH.deposit({ value: ETHAmountV2 })
-    await WETH.transfer(WETHPair.address, ETHAmountV2)
-    await WETHPair.mint(wallet.address, overrides)
+    const tx3 = await WETHPartner.transfer(WETHPair.address, WETHPartnerAmountV2); await tx3.wait()
+    const tx4 = await WETH.deposit({ value: ETHAmountV2 }); await tx4.wait()
+    const tx5 = await WETH.transfer(WETHPair.address, ETHAmountV2); await tx5.wait()
+    const tx6 = await WETHPair.mint(wallet.address, overrides); await tx6.wait()
 
     const balanceBefore = await provider.getBalance(wallet.address)
 
@@ -132,13 +132,13 @@ describe('ExampleFlashSwap', () => {
     const WETHPairToken0 = await WETHPair.token0()
     const amount0 = WETHPairToken0 === WETHPartner.address ? arbitrageAmount : bigNumberify(0)
     const amount1 = WETHPairToken0 === WETHPartner.address ? bigNumberify(0) : arbitrageAmount
-    await WETHPair.swap(
+    const tx7 = await WETHPair.swap(
       amount0,
       amount1,
       flashSwapExample.address,
       defaultAbiCoder.encode(['uint'], [bigNumberify(1)]),
       overrides
-    )
+    ); await tx7.wait()
 
     const balanceAfter = await provider.getBalance(wallet.address)
     const profit = balanceAfter.sub(balanceBefore)

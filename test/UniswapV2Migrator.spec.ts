@@ -44,12 +44,12 @@ describe('UniswapV2Migrator', () => {
   it('migrate', async () => {
     const WETHPartnerAmount = expandTo18Decimals(1)
     const ETHAmount = expandTo18Decimals(4)
-    await WETHPartner.approve(WETHExchangeV1.address, MaxUint256)
-    await WETHExchangeV1.addLiquidity(bigNumberify(1), WETHPartnerAmount, MaxUint256, {
+    const tx1 = await WETHPartner.approve(WETHExchangeV1.address, MaxUint256); await tx1.wait()
+    const tx2 = await WETHExchangeV1.addLiquidity(bigNumberify(1), WETHPartnerAmount, MaxUint256, {
       ...overrides,
       value: ETHAmount
-    })
-    await WETHExchangeV1.approve(migrator.address, MaxUint256)
+    }); await tx2.wait()
+    const tx3 = await WETHExchangeV1.approve(migrator.address, MaxUint256); await tx3.wait()
     const expectedLiquidity = expandTo18Decimals(2)
     const WETHPairToken0 = await WETHPair.token0()
     await expect(
